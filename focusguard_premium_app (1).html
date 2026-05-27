@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--bg:#060810;--bg2:#0d1117;--bg3:#111827;
+--glass:rgba(255,255,255,0.04);--glass2:rgba(255,255,255,0.08);
+--border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.15);
+--text:#f0f4ff;--text2:#8892a4;--text3:#4a5568;
+--accent:#6366f1;--accent2:#8b5cf6;--accent3:#06b6d4;
+--green:#10b981;--red:#ef4444;--amber:#f59e0b;--pink:#ec4899;
+--r:16px;--r2:12px;--r3:8px;
+}
+body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+.app{max-width:400px;margin:0 auto;min-height:100vh;position:relative;background:var(--bg)}
+
+/* STARS BG */
+.stars{position:fixed;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:0;overflow:hidden}
+.star{position:absolute;background:#fff;border-radius:50%;animation:twinkle linear infinite}
+@keyframes twinkle{0%,100%{opacity:.1}50%{opacity:.7}}
+
+/* NAV */
+.navbar{position:sticky;top:0;z-index:100;padding:14px 20px 10px;display:flex;align-items:center;justify-content:space-between;background:rgba(6,8,16,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;background:linear-gradient(135deg,var(--accent),var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;cursor:pointer}
+.lang-btn{background:var(--glass);border:1px solid var(--border);color:var(--text2);padding:4px 10px;border-radius:20px;font-size:11px;cursor:pointer;font-family:inherit;transition:.2s}
+.lang-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:400px;z-index:100;background:rgba(6,8,16,0.9);backdrop-filter:blur(20px);border-top:1px solid var(--border);padding:8px 0 12px;display:flex;justify-content:space-around}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 12px;border-radius:var(--r3);transition:.2s;background:none;border:none;color:var(--text3)}
+.nav-item.active{color:var(--accent)}
+.nav-item span{font-size:9px;font-weight:500}
+.nav-icon{font-size:20px}
+
+/* SCREEN */
+.screen{display:none;padding:16px 16px 90px;animation:fadeUp .3s ease}
+.screen.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* CARDS */
+.card{background:var(--glass);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(99,102,241,0.5),transparent)}
+.card-title{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:10px}
+
+/* FOCUS RING */
+.focus-ring{width:180px;height:180px;margin:0 auto 20px;position:relative;display:flex;align-items:center;justify-content:center}
+.ring-svg{position:absolute;top:0;left:0;transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:rgba(255,255,255,0.05);stroke-width:8}
+.ring-fill{fill:none;stroke-width:8;stroke-linecap:round;stroke-dasharray:502;transition:stroke-dashoffset 1s ease}
+.ring-inner{text-align:center;z-index:1}
+.ring-time{font-family:'Syne',sans-serif;font-size:36px;font-weight:800;line-height:1}
+.ring-label{font-size:10px;color:var(--text2);margin-top:4px;letter-spacing:.06em}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:12px 20px;border-radius:var(--r2);font-family:inherit;font-weight:600;font-size:14px;cursor:pointer;transition:.2s;border:none;width:100%}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+.btn-primary:hover{opacity:.9;transform:scale(.99)}
+.btn-primary:active{transform:scale(.97)}
+.btn-ghost{background:var(--glass);border:1px solid var(--border);color:var(--text2)}
+.btn-ghost:hover{border-color:var(--border2);color:var(--text)}
+.btn-danger{background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:var(--red)}
+.btn-sm{padding:8px 14px;font-size:12px;width:auto;border-radius:var(--r3)}
+
+/* STAT GRID */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.stat-card{background:var(--glass);border:1px solid var(--border);border-radius:var(--r2);padding:14px 12px}
+.stat-val{font-family:'Syne',sans-serif;font-size:22px;font-weight:700}
+.stat-lbl{font-size:10px;color:var(--text2);margin-top:2px}
+
+/* STREAK */
+.streak-bar{display:flex;gap:5px;margin:10px 0}
+.streak-day{flex:1;height:32px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600}
+.streak-day.done{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+.streak-day.today{background:var(--glass2);border:1px solid var(--accent);color:var(--accent)}
+.streak-day.empty{background:rgba(255,255,255,0.03);color:var(--text3)}
+
+/* APP LIST */
+.app-item{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)}
+.app-item:last-child{border-bottom:none}
+.app-left{display:flex;align-items:center;gap:10px}
+.app-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.app-name{font-size:13px;font-weight:500}
+.app-cat{font-size:10px;color:var(--text2)}
+.toggle{width:42px;height:24px;border-radius:12px;background:rgba(255,255,255,0.1);position:relative;cursor:pointer;transition:.2s;border:none}
+.toggle.on{background:linear-gradient(135deg,var(--accent),var(--accent2))}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.2s}
+.toggle.on::after{left:21px}
+
+/* PROGRESS BAR */
+.prog-bar{height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden;margin:8px 0}
+.prog-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .8s ease}
+
+/* ALERT BADGE */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:20px;font-size:10px;font-weight:600}
+.badge-green{background:rgba(16,185,129,0.15);color:var(--green);border:1px solid rgba(16,185,129,0.25)}
+.badge-red{background:rgba(239,68,68,0.15);color:var(--red);border:1px solid rgba(239,68,68,0.25)}
+.badge-amber{background:rgba(245,158,11,0.15);color:var(--amber);border:1px solid rgba(245,158,11,0.25)}
+.badge-blue{background:rgba(99,102,241,0.15);color:var(--accent);border:1px solid rgba(99,102,241,0.25)}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)}
+.modal-overlay.show{display:flex}
+.modal{background:var(--bg3);border:1px solid var(--border2);border-radius:24px 24px 0 0;padding:20px;width:100%;max-width:400px;animation:slideUp .3s ease}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px}
+
+/* AI COACH */
+.ai-bubble{background:var(--glass2);border:1px solid var(--border);border-radius:var(--r2);padding:14px;margin-bottom:10px;position:relative}
+.ai-bubble::before{content:'🤖';position:absolute;top:-10px;left:12px;font-size:18px}
+.ai-text{font-size:13px;line-height:1.6;color:var(--text2);padding-top:4px}
+.ai-text strong{color:var(--text)}
+
+/* CHART */
+.mini-chart{display:flex;align-items:flex-end;gap:5px;height:70px;margin:12px 0}
+.bar{flex:1;border-radius:3px 3px 0 0;background:linear-gradient(180deg,var(--accent2),var(--accent));transition:height .6s ease;min-height:4px;position:relative}
+.bar.today-bar{background:linear-gradient(180deg,var(--accent3),var(--accent))}
+.bar-day{font-size:8px;color:var(--text3);margin-top:4px;text-align:center}
+
+/* PUNISHMENT */
+.punishment-card{background:rgba(239,68,68,0.05);border:1px solid rgba(239,68,68,0.2);border-radius:var(--r2);padding:14px;margin-bottom:10px}
+
+/* SESSION DURATION PILLS */
+.dur-pills{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+.dur-pill{padding:6px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--glass);color:var(--text2);transition:.2s}
+.dur-pill.selected{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-color:transparent}
+
+/* LOCK INDICATOR */
+.lock-indicator{display:flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:var(--r3);margin-bottom:10px}
+.lock-dot{width:8px;height:8px;border-radius:50%;background:var(--red);box-shadow:0 0 8px var(--red);animation:pulse 1.5s ease infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(.8)}}
+
+/* FOCUS OVERLAY */
+.focus-overlay{position:fixed;inset:0;background:rgba(6,8,16,0.97);z-index:300;display:none;flex-direction:column;align-items:center;justify-content:center;padding:30px;text-align:center}
+.focus-overlay.show{display:flex}
+.fo-title{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+.fo-quote{font-size:14px;color:var(--text2);margin-bottom:30px;line-height:1.6;max-width:300px}
+
+/* INPUT */
+.inp{background:var(--glass);border:1px solid var(--border);border-radius:var(--r3);padding:10px 14px;color:var(--text);font-family:inherit;font-size:13px;width:100%;margin-bottom:8px}
+.inp:focus{outline:none;border-color:var(--accent)}
+
+/* SCROLL */
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* SECTION TITLE */
+.section-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:6px}
+.section-sub{font-size:12px;color:var(--text2);margin-bottom:16px}
+
+/* FUTURE YOU */
+.future-card{background:linear-gradient(135deg,rgba(99,102,241,0.15),rgba(139,92,246,0.1));border:1px solid rgba(99,102,241,0.3);border-radius:var(--r);padding:20px;text-align:center;margin-bottom:12px}
+.future-avatar{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:28px}
+.future-name{font-family:'Syne',sans-serif;font-size:16px;font-weight:700}
+.future-desc{font-size:12px;color:var(--text2);margin-top:4px;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="stars" id="starsContainer"></div>
+
+<div class="app">
+  <!-- NAVBAR -->
+  <div class="navbar">
+    <div class="nav-logo">FocusGuard</div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <button class="lang-btn" onclick="toggleLang()" id="langBtn">বাংলা</button>
+      <div class="nav-avatar">🎯</div>
+    </div>
+  </div>
+
+  <!-- SCREENS -->
+
+  <!-- HOME -->
+  <div class="screen active" id="screen-home">
+    <div class="section-title" id="t-hello">Good Morning ☀️</div>
+    <div class="section-sub" id="t-ready">Are you ready to conquer today?</div>
+
+    <!-- Focus Ring Card -->
+    <div class="card">
+      <div class="card-title" id="t-focus-session">Focus Session</div>
+
+      <div class="focus-ring">
+        <svg class="ring-svg" width="180" height="180">
+          <circle class="ring-bg" cx="90" cy="90" r="80"/>
+          <circle class="ring-fill" id="ringFill" cx="90" cy="90" r="80" stroke="url(#grad)" stroke-dashoffset="502"/>
+          <defs>
+            <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#6366f1"/>
+              <stop offset="100%" stop-color="#06b6d4"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <div class="ring-inner">
+          <div class="ring-time" id="timerDisplay">00:00</div>
+          <div class="ring-label" id="t-tap-start">TAP TO BEGIN</div>
+        </div>
+      </div>
+
+      <div class="dur-pills">
+        <div class="dur-pill selected" onclick="selectDur(this,25)" data-mins="25">25 min</div>
+        <div class="dur-pill" onclick="selectDur(this,60)" data-mins="60">1 hr</div>
+        <div class="dur-pill" onclick="selectDur(this,120)" data-mins="120">2 hr</div>
+        <div class="dur-pill" onclick="selectDur(this,180)" data-mins="180">3 hr</div>
+      </div>
+
+      <button class="btn btn-primary" id="focusBtn" onclick="toggleFocus()">
+        <span>⚡</span> <span id="t-start-focus">Start Focus Session</span>
+      </button>
+    </div>
+
+    <!-- Stats -->
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-val" style="color:var(--accent3)">4.2h</div>
+        <div class="stat-lbl" id="t-today-focus">Today's Focus</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" style="color:var(--green)">🔥 12</div>
+        <div class="stat-lbl" id="t-day-streak">Day Streak</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" style="color:var(--amber)">87</div>
+        <div class="stat-lbl" id="t-focus-score">Focus Score</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" style="color:var(--pink)">Level 4</div>
+        <div class="stat-lbl" id="t-discipline">Discipline Level</div>
+      </div>
+    </div>
+
+    <!-- Weekly Chart -->
+    <div class="card">
+      <div class="card-title" id="t-weekly">Weekly Progress</div>
+      <div class="mini-chart" id="weekChart"></div>
+      <div style="display:flex;justify-content:space-between;margin-top:-6px" id="chartDays"></div>
+    </div>
+
+    <!-- Streak -->
+    <div class="card">
+      <div class="card-title" id="t-streak-title">This Week Streak</div>
+      <div class="streak-bar" id="streakBar"></div>
+    </div>
+  </div>
+
+  <!-- BLOCK -->
+  <div class="screen" id="screen-block">
+    <div class="section-title" id="t-block-title">App Blocker</div>
+    <div class="section-sub" id="t-block-sub">Block distracting apps during focus</div>
+
+    <div id="lockIndicatorArea"></div>
+
+    <div class="card">
+      <div class="card-title" id="t-blocked-apps">Blocked Apps</div>
+      <div id="appList"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title" id="t-anti-uninstall">Anti-Uninstall Protection</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div>
+          <div class="app-name" id="t-lock-app">Lock App for Duration</div>
+          <div class="app-cat" id="t-lock-desc">Cannot uninstall until timer ends</div>
+        </div>
+        <button class="toggle on" id="antiUninstallToggle" onclick="this.classList.toggle('on')"></button>
+      </div>
+      <div class="dur-pills">
+        <div class="dur-pill selected" onclick="selectLockDur(this)" data-d="7">7 Days</div>
+        <div class="dur-pill" onclick="selectLockDur(this)" data-d="30">30 Days</div>
+        <div class="dur-pill" onclick="selectLockDur(this)" data-d="90">90 Days</div>
+      </div>
+      <div style="font-size:11px;color:var(--amber);margin-top:8px;padding:8px;background:rgba(245,158,11,0.08);border-radius:var(--r3);border:1px solid rgba(245,158,11,0.2)" id="t-emergency-warn">
+        ⚠️ Emergency uninstall requires 24-hour cooldown + guardian PIN
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title" id="t-dopamine-title">Dopamine Detox Mode</div>
+      <div id="dopamineList"></div>
+    </div>
+  </div>
+
+  <!-- COACH -->
+  <div class="screen" id="screen-coach">
+    <div class="section-title" id="t-coach-title">AI Study Coach</div>
+    <div class="section-sub" id="t-coach-sub">Your personal discipline mentor</div>
+
+    <!-- Future You -->
+    <div class="future-card">
+      <div class="future-avatar">🎓</div>
+      <div class="future-name" id="t-future-name">Future You — 2026</div>
+      <div class="future-desc" id="t-future-desc">Top student. Full scholarship. Zero regrets.<br>Every focused hour today builds this version of you.</div>
+    </div>
+
+    <!-- AI Messages -->
+    <div class="card">
+      <div class="card-title" id="t-ai-messages">AI Motivation Engine</div>
+      <div id="aiMessages"></div>
+      <button class="btn btn-ghost" style="margin-top:8px;font-size:12px" onclick="refreshAI()">
+        🔄 <span id="t-new-msg">Get New Message</span>
+      </button>
+    </div>
+
+    <!-- Punishment -->
+    <div class="card">
+      <div class="card-title" id="t-punishment-title">Smart Punishment System</div>
+      <div class="punishment-card">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          <span style="font-size:20px">⚠️</span>
+          <div class="app-name" id="t-punish-title">Focus Break Detected!</div>
+        </div>
+        <div class="app-cat" id="t-punish-desc">You tried to open Instagram during study. Lock extended by 15 minutes.</div>
+        <div style="margin-top:8px;display:flex;gap:6px">
+          <span class="badge badge-red">+15 min penalty</span>
+          <span class="badge badge-amber">3 warnings left</span>
+        </div>
+      </div>
+
+      <div style="margin-bottom:8px">
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+          <span id="t-self-control">Self-Control Level</span>
+          <span style="color:var(--accent)">72%</span>
+        </div>
+        <div class="prog-bar"><div class="prog-fill" style="width:72%"></div></div>
+      </div>
+    </div>
+
+    <!-- Challenge -->
+    <div class="card">
+      <div class="card-title" id="t-challenge-title">Today's Challenge</div>
+      <div style="display:flex;align-items:center;gap:12px;padding:8px 0">
+        <div style="font-size:32px">🏆</div>
+        <div>
+          <div class="app-name" id="t-challenge-name">3-Hour Deep Focus</div>
+          <div class="app-cat" id="t-challenge-desc">No breaks. No distractions. Pure focus.</div>
+          <div style="margin-top:6px"><span class="badge badge-blue">+50 XP reward</span></div>
+        </div>
+      </div>
+      <div class="prog-bar"><div class="prog-fill" style="width:40%"></div></div>
+      <div style="font-size:10px;color:var(--text2);margin-top:4px" id="t-challenge-prog">1.2 / 3 hours completed</div>
+    </div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="screen" id="screen-settings">
+    <div class="section-title" id="t-settings-title">Settings</div>
+    <div class="section-sub" id="t-settings-sub">Customize your discipline fortress</div>
+
+    <div class="card">
+      <div class="card-title" id="t-profile-title">Profile</div>
+      <input class="inp" id="t-name-inp" placeholder="Your name" value="Muhammad Adnan">
+      <input class="inp" id="t-goal-inp" placeholder="Your study goal" value="SSC 2025 A+ Result">
+      <button class="btn btn-primary" style="margin-top:4px" onclick="saveProfile()">
+        <span id="t-save">💾 Save Profile</span>
+      </button>
+    </div>
+
+    <div class="card">
+      <div class="card-title" id="t-notif-title">Notifications</div>
+      <div id="notifList"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title" id="t-danger-title">Danger Zone</div>
+      <button class="btn btn-danger" style="margin-bottom:8px" onclick="showEmergency()">
+        🚨 <span id="t-emergency-btn">Emergency Unlock (24hr wait)</span>
+      </button>
+      <button class="btn btn-ghost" onclick="resetApp()">
+        🔄 <span id="t-reset">Reset All Data</span>
+      </button>
+    </div>
+
+    <div style="text-align:center;padding:16px 0;color:var(--text3);font-size:11px">
+      FocusGuard Pro v2.0 · Made for discipline · Offline-first 🔒
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav">
+    <button class="nav-item active" onclick="switchTab('home',this)">
+      <span class="nav-icon">🏠</span>
+      <span id="nb-home">Home</span>
+    </button>
+    <button class="nav-item" onclick="switchTab('block',this)">
+      <span class="nav-icon">🛡️</span>
+      <span id="nb-block">Block</span>
+    </button>
+    <button class="nav-item" onclick="switchTab('coach',this)">
+      <span class="nav-icon">🤖</span>
+      <span id="nb-coach">Coach</span>
+    </button>
+    <button class="nav-item" onclick="switchTab('settings',this)">
+      <span class="nav-icon">⚙️</span>
+      <span id="nb-settings">Settings</span>
+    </button>
+  </div>
+</div>
+
+<!-- FOCUS OVERLAY -->
+<div class="focus-overlay" id="focusOverlay">
+  <div style="font-size:48px;margin-bottom:16px">🔥</div>
+  <div class="fo-title" id="fo-title">FOCUS MODE ACTIVE</div>
+  <div class="fo-quote" id="fo-quote">"The pain of discipline is far less than the pain of regret."</div>
+
+  <div style="margin:20px 0;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:20px 32px;text-align:center">
+    <div style="font-size:48px;font-family:'Syne',sans-serif;font-weight:800;background:linear-gradient(135deg,#6366f1,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent" id="overlayTimer">00:00</div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:4px;letter-spacing:.1em" id="fo-remaining">REMAINING</div>
+  </div>
+
+  <div style="display:flex;gap:8px;flex-direction:column;width:100%;max-width:280px">
+    <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center" id="blockedBadges"></div>
+  </div>
+
+  <button class="btn btn-ghost" style="margin-top:24px;max-width:200px;border-color:rgba(239,68,68,0.4);color:rgba(239,68,68,0.7)" onclick="requestBreak()" id="fo-break-btn">
+    ⚠️ Request Break
+  </button>
+  <div style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px" id="fo-warning-label">3 warnings before penalty</div>
+</div>
+
+<!-- EMERGENCY MODAL -->
+<div class="modal-overlay" id="emergencyModal" onclick="closeModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div style="font-size:24px;text-align:center;margin-bottom:12px">🚨</div>
+    <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;text-align:center;color:var(--red);margin-bottom:8px" id="modal-title">Emergency Unlock</div>
+    <div style="font-size:13px;color:var(--text2);text-align:center;margin-bottom:16px;line-height:1.6" id="modal-desc">
+      This will start a 24-hour cooldown timer. Are you sure you want to override your commitment to yourself?
+    </div>
+    <input class="inp" placeholder="Enter Guardian PIN" type="password" id="guardianPin">
+    <button class="btn btn-danger" style="margin-bottom:8px" onclick="confirmEmergency()" id="modal-confirm">Start 24hr Cooldown</button>
+    <button class="btn btn-ghost" onclick="closeModal()" id="modal-cancel">Stay Committed 💪</button>
+  </div>
+</div>
+
+<script>
+// STARS
+const starsEl = document.getElementById('starsContainer');
+for(let i=0;i<60;i++){
+  const s=document.createElement('div');
+  s.className='star';
+  const sz=Math.random()*2+1;
+  s.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;animation-duration:${2+Math.random()*4}s;animation-delay:${Math.random()*4}s`;
+  starsEl.appendChild(s);
+}
+
+// STATE
+let isBangla=false;
+let isFocusing=false;
+let selectedMins=25;
+let timerInterval=null;
+let secondsLeft=0;
+let totalSeconds=0;
+let warnings=3;
+
+// TRANSLATIONS
+const T={
+  en:{
+    hello:'Good Morning ☀️',ready:'Are you ready to conquer today?',
+    'focus-session':'Focus Session','tap-start':'TAP TO BEGIN',
+    'start-focus':'Start Focus Session','stop-focus':'Stop Session',
+    'today-focus':"Today's Focus",'day-streak':'Day Streak',
+    'focus-score':'Focus Score','discipline':'Discipline Level',
+    weekly:'Weekly Progress','streak-title':'This Week Streak',
+    'block-title':'App Blocker','block-sub':'Block distracting apps during focus',
+    'blocked-apps':'Blocked Apps','anti-uninstall':'Anti-Uninstall Protection',
+    'lock-app':'Lock App for Duration','lock-desc':'Cannot uninstall until timer ends',
+    'emergency-warn':'⚠️ Emergency uninstall requires 24-hour cooldown + guardian PIN',
+    'dopamine-title':'Dopamine Detox Mode',
+    'coach-title':'AI Study Coach','coach-sub':'Your personal discipline mentor',
+    'future-name':'Future You — 2026','future-desc':'Top student. Full scholarship. Zero regrets.\nEvery focused hour today builds this version of you.',
+    'ai-messages':'AI Motivation Engine','new-msg':'Get New Message',
+    'punishment-title':'Smart Punishment System','punish-title':'Focus Break Detected!',
+    'punish-desc':'You tried to open Instagram during study. Lock extended by 15 minutes.',
+    'self-control':'Self-Control Level','challenge-title':"Today's Challenge",
+    'challenge-name':'3-Hour Deep Focus','challenge-desc':'No breaks. No distractions. Pure focus.',
+    'challenge-prog':'1.2 / 3 hours completed',
+    'settings-title':'Settings','settings-sub':'Customize your discipline fortress',
+    'profile-title':'Profile','save':'💾 Save Profile','notif-title':'Notifications',
+    'danger-title':'Danger Zone','emergency-btn':'Emergency Unlock (24hr wait)',
+    reset:'Reset All Data',
+    'nb-home':'Home','nb-block':'Block','nb-coach':'Coach','nb-settings':'Settings',
+    'fo-title':'FOCUS MODE ACTIVE','fo-remaining':'REMAINING','fo-break-btn':'⚠️ Request Break',
+    'fo-warning-label':'3 warnings before penalty',
+    'modal-title':'Emergency Unlock','modal-confirm':'Start 24hr Cooldown','modal-cancel':'Stay Committed 💪',
+    'modal-desc':'This will start a 24-hour cooldown timer. Are you sure you want to override your commitment to yourself?',
+  },
+  bn:{
+    hello:'শুভ সকাল ☀️',ready:'আজকে কি তুমি জয় করতে প্রস্তুত?',
+    'focus-session':'ফোকাস সেশন','tap-start':'শুরু করতে ট্যাপ করো',
+    'start-focus':'ফোকাস সেশন শুরু করো','stop-focus':'সেশন বন্ধ করো',
+    'today-focus':'আজকের ফোকাস','day-streak':'দিনের স্ট্রিক',
+    'focus-score':'ফোকাস স্কোর','discipline':'শৃঙ্খলার স্তর',
+    weekly:'সাপ্তাহিক অগ্রগতি','streak-title':'এই সপ্তাহের স্ট্রিক',
+    'block-title':'অ্যাপ ব্লকার','block-sub':'ফোকাসের সময় বিক্ষিপ্তকারী অ্যাপ বন্ধ করো',
+    'blocked-apps':'ব্লক করা অ্যাপসমূহ','anti-uninstall':'আনইন্সটল সুরক্ষা',
+    'lock-app':'নির্দিষ্ট সময়ের জন্য লক করো','lock-desc':'টাইমার শেষ না হওয়া পর্যন্ত আনইন্সটল করা যাবে না',
+    'emergency-warn':'⚠️ জরুরি আনইন্সটলে ২৪ ঘণ্টার বিলম্ব + অভিভাবক পিন প্রয়োজন',
+    'dopamine-title':'ডোপামিন ডিটক্স মোড',
+    'coach-title':'AI পড়াশোনা কোচ','coach-sub':'তোমার ব্যক্তিগত শৃঙ্খলা গুরু',
+    'future-name':'ভবিষ্যতের তুমি — ২০২৬','future-desc':'শীর্ষ শিক্ষার্থী। পূর্ণ বৃত্তি। শূন্য অনুশোচনা।\nআজকের প্রতিটি মনোযোগী ঘণ্টা এই তোমাকে গড়ে তুলছে।',
+    'ai-messages':'AI অনুপ্রেরণা ইঞ্জিন','new-msg':'নতুন বার্তা দেখাও',
+    'punishment-title':'স্মার্ট শাস্তি সিস্টেম','punish-title':'ফোকাস ভাঙার চেষ্টা ধরা পড়েছে!',
+    'punish-desc':'পড়ার সময় ইনস্টাগ্রাম খোলার চেষ্টা করেছো। লক আরও ১৫ মিনিট বাড়ানো হয়েছে।',
+    'self-control':'আত্মনিয়ন্ত্রণের মাত্রা','challenge-title':'আজকের চ্যালেঞ্জ',
+    'challenge-name':'৩ ঘণ্টার গভীর ফোকাস','challenge-desc':'কোনো বিরতি নেই। কোনো বিক্ষেপ নেই। শুধু মনোযোগ।',
+    'challenge-prog':'১.২ / ৩ ঘণ্টা সম্পন্ন',
+    'settings-title':'সেটিংস','settings-sub':'তোমার শৃঙ্খলার দুর্গ কাস্টমাইজ করো',
+    'profile-title':'প্রোফাইল','save':'💾 প্রোফাইল সেভ করো','notif-title':'বিজ্ঞপ্তি',
+    'danger-title':'বিপদ জোন','emergency-btn':'জরুরি আনলক (২৪ ঘণ্টা অপেক্ষা)',
+    reset:'সব ডেটা রিসেট করো',
+    'nb-home':'হোম','nb-block':'ব্লক','nb-coach':'কোচ','nb-settings':'সেটিং',
+    'fo-title':'ফোকাস মোড চালু','fo-remaining':'বাকি আছে','fo-break-btn':'⚠️ বিরতি চাই',
+    'fo-warning-label':'৩টি সতর্কতার পর জরিমানা',
+    'modal-title':'জরুরি আনলক','modal-confirm':'২৪ ঘণ্টার কাউন্টডাউন শুরু','modal-cancel':'অঙ্গীকারে থাকো 💪',
+    'modal-desc':'এটি ২৪ ঘণ্টার কাউন্টডাউন শুরু করবে। তুমি কি সত্যিই নিজের প্রতিশ্রুতি ভাঙতে চাও?',
+  }
+};
+
+function t(k){return(isBangla?T.bn:T.en)[k]||k}
+
+function applyLang(){
+  document.querySelectorAll('[id^="t-"]').forEach(el=>{
+    const k=el.id.slice(2);
+    if(T.en[k])el.textContent=t(k);
+  });
+  document.querySelectorAll('[id^="nb-"]').forEach(el=>{
+    const k=el.id;
+    if(T.en[k])el.textContent=t(k);
+  });
+  // overlay
+  ['fo-title','fo-remaining','fo-break-btn','fo-warning-label','modal-title','modal-confirm','modal-cancel','modal-desc'].forEach(k=>{
+    const el=document.getElementById(k);
+    if(el&&T.en[k])el.textContent=t(k);
+  });
+  buildBlockList();buildDopamineList();buildNotifList();buildAIMessages();
+  document.getElementById('langBtn').textContent=isBangla?'English':'বাংলা';
+}
+
+function toggleLang(){isBangla=!isBangla;applyLang()}
+
+// NAV
+function switchTab(name,el){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  el.classList.add('active');
+}
+
+// DURATION SELECT
+function selectDur(el,mins){
+  document.querySelectorAll('.dur-pill').forEach(p=>{
+    if(p.dataset.mins)p.classList.remove('selected');
+  });
+  el.classList.add('selected');
+  selectedMins=mins;
+  secondsLeft=mins*60;
+  totalSeconds=mins*60;
+  updateTimerDisplay();
+}
+
+function selectLockDur(el){
+  document.querySelectorAll('.dur-pill:not([data-mins])').forEach(p=>p.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+// TIMER
+function updateTimerDisplay(){
+  const m=Math.floor(secondsLeft/60);
+  const s=secondsLeft%60;
+  const str=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+  document.getElementById('timerDisplay').textContent=str;
+  document.getElementById('overlayTimer').textContent=str;
+
+  const prog=totalSeconds>0?(1-secondsLeft/totalSeconds):0;
+  const offset=502-(502*prog);
+  document.getElementById('ringFill').style.strokeDashoffset=offset;
+}
+
+function toggleFocus(){
+  if(isFocusing){
+    stopFocus();
+  } else {
+    startFocus();
+  }
+}
+
+function startFocus(){
+  isFocusing=true;
+  secondsLeft=selectedMins*60;
+  totalSeconds=secondsLeft;
+  warnings=3;
+  document.getElementById('focusBtn').innerHTML='<span>⏹</span> <span>'+t('stop-focus')+'</span>';
+  document.getElementById('focusOverlay').classList.add('show');
+  document.getElementById('fo-warning-label').textContent=(isBangla?'৩':'3')+' '+(t('fo-warning-label').replace(/^[0-9৩] /,''));
+
+  // Build blocked badges
+  const bb=document.getElementById('blockedBadges');
+  const apps=['📘 FB','📸 IG','🎵 TikTok','▶️ YT','🎮 PUBG'];
+  bb.innerHTML=apps.map(a=>`<span class="badge badge-red">${a} 🚫</span>`).join('');
+
+  timerInterval=setInterval(()=>{
+    if(secondsLeft>0){
+      secondsLeft--;
+      updateTimerDisplay();
+    } else {
+      completeFocus();
+    }
+  },1000);
+}
+
+function stopFocus(){
+  isFocusing=false;
+  clearInterval(timerInterval);
+  document.getElementById('focusOverlay').classList.remove('show');
+  document.getElementById('focusBtn').innerHTML='<span>⚡</span> <span>'+t('start-focus')+'</span>';
+  secondsLeft=selectedMins*60;
+  totalSeconds=secondsLeft;
+  updateTimerDisplay();
+  document.getElementById('ringFill').style.strokeDashoffset=502;
+}
+
+function completeFocus(){
+  stopFocus();
+  alert(isBangla?'🎉 অসাধারণ! সেশন সম্পন্ন হয়েছে। তুমি দুর্দান্ত!':'🎉 Amazing! Session complete. You crushed it!');
+}
+
+function requestBreak(){
+  warnings--;
+  if(warnings<=0){
+    alert(isBangla?'⚠️ সতর্কতা শেষ! লক সময় ১৫ মিনিট বাড়ানো হয়েছে।':'⚠️ Warnings exhausted! Lock extended by 15 minutes.');
+    secondsLeft+=900;totalSeconds+=900;warnings=3;
+  } else {
+    alert(isBangla?`⚠️ মনোযোগ ভাঙার চেষ্টা! ${warnings}টি সতর্কতা বাকি আছে।`:`⚠️ Focus break attempt! ${warnings} warnings left.`);
+  }
+  document.getElementById('fo-warning-label').textContent=(isBangla?warnings:warnings)+' '+(t('fo-warning-label').replace(/^[0-9৩] /,''));
+}
+
+// CHART
+function buildChart(){
+  const vals=[3.2,4.8,2.1,5.5,3.9,4.2,0];
+  const days=isBangla?['সো','মঙ','বু','বৃ','শু','শ','র']:['M','T','W','T','F','S','S'];
+  const chart=document.getElementById('weekChart');
+  const daysEl=document.getElementById('chartDays');
+  const maxV=Math.max(...vals);
+  chart.innerHTML=vals.map((v,i)=>`<div class="bar ${i===5?'today-bar':''}" style="height:${(v/maxV)*100}%;width:100%"></div>`).join('');
+  daysEl.innerHTML=days.map((d,i)=>`<div style="font-size:8px;color:${i===5?'var(--accent3)':'var(--text3)'};flex:1;text-align:center">${d}</div>`).join('');
+}
+
+// STREAK
+function buildStreak(){
+  const states=['done','done','done','done','done','today','empty'];
+  const days=isBangla?['সো','মঙ','বু','বৃ','শু','শ','র']:['M','T','W','T','F','S','S'];
+  document.getElementById('streakBar').innerHTML=states.map((s,i)=>
+    `<div class="streak-day ${s}">${days[i]}</div>`
+  ).join('');
+}
+
+// APPS
+const blockedApps=[
+  {n:'Facebook',icon:'📘',cat:isBangla?'সামাজিক মিডিয়া':'Social Media',on:true},
+  {n:'Instagram',icon:'📸',cat:'Social Media',on:true},
+  {n:'TikTok',icon:'🎵',cat:'Short Video',on:true},
+  {n:'YouTube',icon:'▶️',cat:'Video',on:true},
+  {n:'PUBG Mobile',icon:'🎮',cat:'Gaming',on:true},
+  {n:'Free Fire',icon:'🔥',cat:'Gaming',on:true},
+  {n:'Snapchat',icon:'👻',cat:'Social Media',on:false},
+];
+
+function buildBlockList(){
+  const list=document.getElementById('appList');
+  if(!list)return;
+  list.innerHTML=blockedApps.map((a,i)=>`
+    <div class="app-item">
+      <div class="app-left">
+        <div class="app-icon" style="background:rgba(255,255,255,0.05)">${a.icon}</div>
+        <div>
+          <div class="app-name">${a.n}</div>
+          <div class="app-cat">${isBangla?catBn(a.cat):a.cat}</div>
+        </div>
+      </div>
+      <button class="toggle ${a.on?'on':''}" onclick="toggleApp(${i},this)"></button>
+    </div>
+  `).join('');
+
+  const li=document.getElementById('lockIndicatorArea');
+  if(li)li.innerHTML=isFocusing?`<div class="lock-indicator"><div class="lock-dot"></div><span style="font-size:12px;color:var(--red)">${isBangla?'ফোকাস মোড চালু — সব অ্যাপ লক':'Focus Mode Active — All Apps Locked'}</span></div>`:'';
+}
+
+function catBn(c){const m={'Social Media':'সামাজিক মিডিয়া','Short Video':'শর্ট ভিডিও','Video':'ভিডিও','Gaming':'গেমিং'};return m[c]||c}
+
+function toggleApp(i,el){
+  blockedApps[i].on=!blockedApps[i].on;
+  el.classList.toggle('on');
+}
+
+const dopamineSettings=[
+  {key:'grayscale',en:'Auto Grayscale Mode',bn:'অটো গ্রেস্কেল মোড',on:true},
+  {key:'mute-notif',en:'Mute Notifications',bn:'বিজ্ঞপ্তি নীরব করো',on:true},
+  {key:'block-reels',en:'Block Reels & Shorts',bn:'রিলস ও শর্টস ব্লক করো',on:true},
+  {key:'ambient',en:'Ambient Study Sounds',bn:'পরিবেষ্টিত পড়ার শব্দ',on:false},
+];
+
+function buildDopamineList(){
+  const el=document.getElementById('dopamineList');
+  if(!el)return;
+  el.innerHTML=dopamineSettings.map((s,i)=>`
+    <div class="app-item">
+      <div class="app-name">${isBangla?s.bn:s.en}</div>
+      <button class="toggle ${s.on?'on':''}" onclick="dopamineSettings[${i}].on=!dopamineSettings[${i}].on;this.classList.toggle('on')"></button>
+    </div>
+  `).join('');
+}
+
+const notifSettings=[
+  {en:'Study Reminders',bn:'পড়ার রিমাইন্ডার',on:true},
+  {en:'Streak Alerts',bn:'স্ট্রিক সতর্কতা',on:true},
+  {en:'AI Motivation',bn:'AI অনুপ্রেরণা',on:true},
+  {en:'Break Warnings',bn:'বিরতি সতর্কতা',on:false},
+];
+
+function buildNotifList(){
+  const el=document.getElementById('notifList');
+  if(!el)return;
+  el.innerHTML=notifSettings.map((s,i)=>`
+    <div class="app-item">
+      <div class="app-name">${isBangla?s.bn:s.en}</div>
+      <button class="toggle ${s.on?'on':''}" onclick="notifSettings[${i}].on=!notifSettings[${i}].on;this.classList.toggle('on')"></button>
+    </div>
+  `).join('');
+}
+
+const aiMsgs={
+  en:[
+    '<strong>Your phone is stealing your future.</strong> Every second you scroll, someone else is studying. That someone will take your seat.',
+    '<strong>Discipline is choosing</strong> between what you want now and what you want most. What do you want MOST?',
+    '<strong>The exam doesn\'t care</strong> if you were tired. The university doesn\'t care about your excuses. Only results matter.',
+    '<strong>You have exactly</strong> the same 24 hours as every topper. The difference is what you do with them.',
+  ],
+  bn:[
+    '<strong>তোমার ফোন তোমার ভবিষ্যৎ চুরি করছে।</strong> তুমি যখন স্ক্রোল করছো, অন্য কেউ পড়ছে। সেই কেউ তোমার আসন নেবে।',
+    '<strong>শৃঙ্খলা হলো</strong> এখন যা চাও আর সবচেয়ে বেশি যা চাও তার মধ্যে বেছে নেওয়া। তুমি সবচেয়ে বেশি কী চাও?',
+    '<strong>পরীক্ষা জানতে চায় না</strong> তুমি ক্লান্ত ছিলে কিনা। বিশ্ববিদ্যালয় অজুহাত শুনতে চায় না। শুধু ফলাফলই গুরুত্বপূর্ণ।',
+    '<strong>প্রতিটি টপারের মতোই</strong> তোমার কাছেও ২৪ ঘণ্টা আছে। পার্থক্য হলো তুমি সেটা কীভাবে ব্যবহার করো।',
+  ]
+};
+let aiIdx=0;
+function buildAIMessages(){
+  const msgs=isBangla?aiMsgs.bn:aiMsgs.en;
+  const el=document.getElementById('aiMessages');
+  if(!el)return;
+  el.innerHTML=`<div class="ai-bubble"><div class="ai-text">${msgs[aiIdx]}</div></div>`;
+}
+function refreshAI(){aiIdx=(aiIdx+1)%(isBangla?aiMsgs.bn.length:aiMsgs.en.length);buildAIMessages()}
+
+// MODAL
+function showEmergency(){document.getElementById('emergencyModal').classList.add('show')}
+function closeModal(){document.getElementById('emergencyModal').classList.remove('show')}
+function confirmEmergency(){
+  const pin=document.getElementById('guardianPin').value;
+  if(pin.length<4){alert(isBangla?'পিন কমপক্ষে ৪ সংখ্যার হতে হবে':'PIN must be at least 4 digits');return}
+  alert(isBangla?'⏳ ২৪ ঘণ্টার কাউন্টডাউন শুরু হয়েছে। এই সময়ের মধ্যে অ্যাপ আনইন্সটল করা যাবে না।':'⏳ 24-hour cooldown started. App cannot be uninstalled during this period.');
+  closeModal();
+}
+
+function saveProfile(){
+  alert(isBangla?'✅ প্রোফাইল সেভ হয়েছে!':'✅ Profile saved!');
+}
+
+function resetApp(){
+  if(confirm(isBangla?'সব ডেটা মুছে ফেলবো?':'Delete all data?')){
+    alert(isBangla?'✅ রিসেট সম্পন্ন':'✅ Reset complete');
+  }
+}
+
+// INIT
+buildChart();
+buildStreak();
+buildBlockList();
+buildDopamineList();
+buildNotifList();
+buildAIMessages();
+secondsLeft=selectedMins*60;
+totalSeconds=secondsLeft;
+updateTimerDisplay();
+</script>
+</body>
+</html>
